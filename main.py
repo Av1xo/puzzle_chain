@@ -1,6 +1,7 @@
 from sys import argv
 from re import split
-from utils import load_data, check_path, EmptyData
+from utils import load_data, check_path
+from errors import *
 
 def get_data_from_path(args: list[str]) -> list[str]:
     data_path: str | None = args[1] if len(args) > 1 else None
@@ -30,7 +31,6 @@ def prepare_data(data: list[str]) -> list[str]:
         for item in split(r"[ ,;.]+", data_line.strip("\n ,;."))
         if item and len(item) >= 2 # (xx) + (xx)yyzz = xxyyzz
     ]
-
 
 def main(args: list[str]) -> None:
     data: list[str] = get_data_from_path(args)

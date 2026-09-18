@@ -1,8 +1,5 @@
 from pathlib import Path
-
-
-class EmptyData(Exception):
-    pass
+from errors import *
 
 
 def check_path(in_path: str) -> tuple[Path | None, bool]:
