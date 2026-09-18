@@ -1,4 +1,5 @@
 from sys import argv
+from re import split
 from utils import load_data, check_path, EmptyData
 
 def get_data_from_path(args: list[str]) -> list[str]:
@@ -21,9 +22,20 @@ def get_data_from_path(args: list[str]) -> list[str]:
             print(f"[FAILED]: Invalid path or not a .txt file: {data_path}")
             data_path = None
 
+
+def prepare_data(data: list[str]) -> list[str]:
+    return [
+        item
+        for data_line in data
+        for item in split(r"[ ,;.]+", data_line.strip("\n ,;."))
+        if item and len(item) >= 2 # (xx) + (xx)yyzz = xxyyzz
+    ]
+
+
 def main(args: list[str]) -> None:
     data: list[str] = get_data_from_path(args)
-    print(data)
+    cleaned_data: list[str] = prepare_data(data)
+    print(cleaned_data)
 
 
 if __name__ == "__main__":
