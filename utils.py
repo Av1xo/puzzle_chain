@@ -95,6 +95,7 @@ def has_euler_path(component: list[Puzzle]) -> bool:
         
     return start_candidates <= 1 and end_candidates <= 1
 
+
 def compare_result(puzzles: list[Puzzle]) -> str:
     result: str = puzzles[0].head + puzzles[0].body + puzzles[0].tail
     for puzzle in puzzles[1:]:

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from puzzle import Puzzle
+from multiprocessing import Pool
 
 
 def hierholzer(component: list[Puzzle]) -> list[Puzzle]:
@@ -39,21 +40,17 @@ def hierholzer(component: list[Puzzle]) -> list[Puzzle]:
     path_edges.reverse()
     return path_edges
 
+def dfs_from_start(args: tuple) -> list[Puzzle]:
+    graph, total, start_puzzle = args
+    best_chain: list[Puzzle] = []
 
-def find_longest_chain(graph: dict[str, list[Puzzle]], all_puzzles: list[Puzzle]) -> list[Puzzle]:
-    best_chain: list[Puzzle] = list()
-    total: int = len(all_puzzles)
-    
     def dfs(current_tail: str, used: set[int], chain: list[Puzzle]) -> None:
         nonlocal best_chain
-        
         if len(chain) > len(best_chain):
             best_chain = chain[:]
-        
         if len(chain) + (total - len(used)) <= len(best_chain):
             return
-        
-        for puzzle in graph.get(current_tail, list()):
+        for puzzle in graph.get(current_tail, []):
             puzzle_id = id(puzzle)
             if puzzle_id in used:
                 continue
@@ -62,9 +59,16 @@ def find_longest_chain(graph: dict[str, list[Puzzle]], all_puzzles: list[Puzzle]
             dfs(puzzle.tail, used, chain)
             chain.pop()
             used.remove(puzzle_id)
-    
-    for start_puzzle in all_puzzles:
-        used = {id(start_puzzle)}
-        dfs(start_puzzle.tail, used, [start_puzzle])
-        
+
+    dfs(start_puzzle.tail, {id(start_puzzle)}, [start_puzzle])
     return best_chain
+
+
+def find_longest_chain(graph: dict[str, list[Puzzle]], all_puzzles: list[Puzzle]) -> list[Puzzle]:
+    total = len(all_puzzles)
+    tasks = [(graph, total, start_puzzle) for start_puzzle in all_puzzles]
+
+    with Pool() as pool:
+        results = pool.map(dfs_from_start, tasks)
+
+    return max(results, key=len)
