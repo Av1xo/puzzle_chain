@@ -1,8 +1,8 @@
 from sys import argv
 from re import split
 from puzzle import Puzzle
-from utils import load_data, check_path, create_puzzles, create_graph
-from algo import find_longest_chain
+from utils import find_components, has_euler_path, load_data, check_path, create_puzzles, create_graph, compare_result
+from algo import find_longest_chain, hierholzer
 from errors import *
 
 def get_data_from_path(args: list[str]) -> list[str]:
@@ -33,18 +33,32 @@ def prepare_data(data: list[str]) -> list[str]:
         for item in split(r"[ ,;.]+", data_line.strip("\n ,;."))
         if item and len(item) >= 2 # (xx) + (xx)yyzz = xxyyzz
     ]
+    
+def find_longest_chain_in_component(component: list[Puzzle]) -> list[Puzzle]:
+    graph = create_graph(component)
+    return find_longest_chain(graph, component) 
+
+def find_best_chain_overall(all_puzzles: list[Puzzle]) -> list[Puzzle]:
+    components = find_components(all_puzzles)
+    best_chain: list[Puzzle] = []
+
+    for component in components:
+        if has_euler_path(component):
+            chain = hierholzer(component)
+        else:
+            chain = find_longest_chain_in_component(component)
+
+        if len(chain) > len(best_chain):
+            best_chain = chain
+
+    return best_chain
 
 def main(args: list[str]) -> None:
     data: list[str] = get_data_from_path(args)
-    print("data:", data)
     cleaned_data: list[str] = prepare_data(data)
-    print("cleaned_data:", cleaned_data)
     puzzles = create_puzzles(cleaned_data)
-    print("puzzles:", puzzles)
-    puzzle_board = create_graph(puzzles)
-    print("puzzle_board:", puzzle_board)
-    best_chain: list[Puzzle] = find_longest_chain(puzzle_board, puzzles)
-    print("best_chain:", best_chain)
+    best_chain: list[Puzzle] = find_best_chain_overall(puzzles)
+    print(compare_result(best_chain))
 
 if __name__ == "__main__":
     main(argv)

@@ -1,4 +1,44 @@
+from collections import defaultdict
 from puzzle import Puzzle
+
+
+def hierholzer(component: list[Puzzle]) -> list[Puzzle]:
+    adjacency: dict[str, list[Puzzle]] = defaultdict(list)
+    for puzzle in component:
+        adjacency[puzzle.head].append(puzzle)
+
+    out_deg = defaultdict(int)
+    in_deg = defaultdict(int)
+    for puzzle in component:
+        out_deg[puzzle.head] += 1
+        in_deg[puzzle.tail] += 1
+
+    start_node = component[0].head
+    for node in set(out_deg) | set(in_deg):
+        if out_deg[node] - in_deg[node] == 1:
+            start_node = node
+            break
+
+    stack = [start_node]
+    path_edges: list[Puzzle] = []
+    edge_stack: list[Puzzle] = []
+
+    current_adj = {node: list(edges) for node, edges in adjacency.items()}
+
+    while stack:
+        node = stack[-1]
+        if current_adj.get(node):
+            next_puzzle = current_adj[node].pop()
+            stack.append(next_puzzle.tail)
+            edge_stack.append(next_puzzle)
+        else:
+            stack.pop()
+            if edge_stack:
+                path_edges.append(edge_stack.pop())
+
+    path_edges.reverse()
+    return path_edges
+
 
 def find_longest_chain(graph: dict[str, list[Puzzle]], all_puzzles: list[Puzzle]) -> list[Puzzle]:
     best_chain: list[Puzzle] = list()
@@ -9,7 +49,6 @@ def find_longest_chain(graph: dict[str, list[Puzzle]], all_puzzles: list[Puzzle]
         
         if len(chain) > len(best_chain):
             best_chain = chain[:]
-            print(best_chain)
         
         if len(chain) + (total - len(used)) <= len(best_chain):
             return
