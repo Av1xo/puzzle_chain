@@ -1,4 +1,4 @@
-from errors import InvalidPuzzle
+from errors import InvalidPuzzleError
 
 
 class Puzzle:
@@ -8,7 +8,7 @@ class Puzzle:
     
     def __init__(self, line: str) -> None:
         if len(line) < 2:
-            raise InvalidPuzzle("[FAILED] Invalid puzzle")
+            raise InvalidPuzzleError("[FAILED] Invalid puzzle")
         
         self.__head = line[:2]
         self.__body = line[2:-2]

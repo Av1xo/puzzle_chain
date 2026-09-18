@@ -1,6 +1,8 @@
 from sys import argv
 from re import split
-from utils import load_data, check_path
+from puzzle import Puzzle
+from utils import load_data, check_path, create_puzzles, create_graph
+from algo import find_longest_chain
 from errors import *
 
 def get_data_from_path(args: list[str]) -> list[str]:
@@ -15,7 +17,7 @@ def get_data_from_path(args: list[str]) -> list[str]:
         if ok:
             try:
                 return load_data(path)
-            except EmptyData as e:
+            except EmptyDataError as e:
                 print(e)
                 data_path = None
                 continue
@@ -34,9 +36,15 @@ def prepare_data(data: list[str]) -> list[str]:
 
 def main(args: list[str]) -> None:
     data: list[str] = get_data_from_path(args)
+    print("data:", data)
     cleaned_data: list[str] = prepare_data(data)
-    print(cleaned_data)
-
+    print("cleaned_data:", cleaned_data)
+    puzzles = create_puzzles(cleaned_data)
+    print("puzzles:", puzzles)
+    puzzle_board = create_graph(puzzles)
+    print("puzzle_board:", puzzle_board)
+    best_chain: list[Puzzle] = find_longest_chain(puzzle_board, puzzles)
+    print("best_chain:", best_chain)
 
 if __name__ == "__main__":
     main(argv)

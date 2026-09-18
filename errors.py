@@ -1,7 +1,7 @@
-__all__ = ["EmptyData", "InvalidPuzzle"]
+__all__ = ["EmptyDataError", "InvalidPuzzleError"]
 
-class EmptyData(Exception):
+class EmptyDataError(Exception):
     pass
 
-class InvalidPuzzle(Exception):
+class InvalidPuzzleError(Exception):
     pass
