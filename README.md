@@ -63,6 +63,7 @@ pyinstaller --onefile --name "PuzzleSolver" cli.py
 ```cmd
 pip install -r requirements.txt
 pyinstaller --onefile --name "PuzzleSolver" cli.py
+```
 
 ### Інструкція з користування (Меню CLI)
 Після запуску ви побачите інтерактивне меню з наступними опціями:
