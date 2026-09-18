@@ -1,6 +1,10 @@
 from pathlib import Path
 
 
+class EmptyData(Exception):
+    pass
+
+
 def check_path(in_path: str) -> tuple[Path | None, bool]:
     path: Path = Path(in_path)
     
@@ -10,5 +14,11 @@ def check_path(in_path: str) -> tuple[Path | None, bool]:
     return None, False
 
 
-def load_data():
-    pass
+def load_data(path: Path) -> list[str]:
+    with open(path, "r") as data_file:
+        data: list[str] = data_file.readlines()  
+
+    if not data:
+        raise EmptyData("[FAILED]: File empty")
+    
+    return data
