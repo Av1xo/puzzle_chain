@@ -14,11 +14,23 @@ def hierholzer(component: list[Puzzle]) -> list[Puzzle]:
         out_deg[puzzle.head] += 1
         in_deg[puzzle.tail] += 1
 
-    start_node = component[0].head
+    # find start vertex for Euler path
+    start_node = None
     for node in set(out_deg) | set(in_deg):
         if out_deg[node] - in_deg[node] == 1:
             start_node = node
             break
+    
+    #if not find (Euler cycle), choose any vertex with out edges
+    if start_node is None:
+        for node, edges in adjacency.items():
+            if edges:
+                start_node = node
+                break
+    
+    # fallback in empty case
+    if start_node is None:
+        return []
 
     stack = [start_node]
     path_edges: list[Puzzle] = []

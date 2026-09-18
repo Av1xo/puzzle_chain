@@ -43,6 +43,11 @@ def find_best_chain_overall(
     for component in components:
         if has_euler_path(component):
             chain = hierholzer(component)
+            
+            # If Girgoltzer failed to use all puzzle components,
+            # run a guaranteed DFS
+            if len(chain) != len(component):
+                chain = find_longest_chain_in_component(component)
         else:
             chain = find_longest_chain_in_component(component)
 

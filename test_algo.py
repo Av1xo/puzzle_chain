@@ -23,6 +23,11 @@ def validate_chain(chain: list[Puzzle]) -> bool:
 
     return True
 
+@pytest.fixture
+def cycle_data() -> list[str]:
+    return [
+        "100020", "200030", "300040", "400050", "500010"
+    ]
 
 @pytest.fixture
 def small_data() -> list[str]:
@@ -41,6 +46,53 @@ def branched_data() -> list[str]:
         "300835", "350936",                                 # пастка №2 від вузла 30: 10-20-30-35-36 (4 пазли)
         "771078",                                           # зайвий
     ]
+
+@pytest.fixture
+def disconnected_edges_data() -> list[str]:
+    return ["100020", "200010", "300040", "400050"]
+
+
+@pytest.fixture
+def multigraph_data() -> list[str]:
+    return ["100020", "100020", "200030", "300010"]
+
+
+def test_fallback_to_dfs_on_disconnected_edges(disconnected_edges_data):
+    puzzles = create_puzzles(disconnected_edges_data)
+    chain = find_best_chain_overall(puzzles)
+    assert len(chain) == 2
+    assert validate_chain(chain)
+
+
+def test_multigraph_duplicate_edges(multigraph_data):
+    puzzles = create_puzzles(multigraph_data)
+    chain = find_best_chain_overall(puzzles)
+    assert validate_chain(chain)
+    
+    
+def test_has_euler_path_true_for_cycle(cycle_data):
+    puzzles = create_puzzles(cycle_data)
+    components = find_components(puzzles)
+    assert len(components) == 1
+    assert has_euler_path(components[0]) is True
+
+
+def test_hierholzer_finds_full_euler_cycle(cycle_data):
+    puzzles = create_puzzles(cycle_data)
+    components = find_components(puzzles)
+    
+    chain = hierholzer(components[0])
+
+    assert len(chain) == 5
+    assert validate_chain(chain)
+
+
+def test_find_best_chain_overall_cycle_dataset(cycle_data):
+    puzzles = create_puzzles(cycle_data)
+    chain = find_best_chain_overall(puzzles)
+
+    assert len(chain) == 5
+    assert validate_chain(chain)
 
 
 def test_puzzle_parses_head_body_tail():
