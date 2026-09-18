@@ -3,7 +3,7 @@ import pytest
 from puzzle import Puzzle
 from utils import create_puzzles, create_graph, has_euler_path, find_components, compare_result
 from algo import find_longest_chain, hierholzer
-from main import find_best_chain_overall, find_longest_chain_in_component
+from solver import find_best_chain_overall, find_longest_chain_in_component
 
 
 def validate_chain(chain: list[Puzzle]) -> bool:
